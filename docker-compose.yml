@@ -1,0 +1,46 @@
+services:
+  db:
+    image: postgres:15
+    container_name: rebac-rbac-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: rebac_rbac_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - rebac-network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rebac-rbac-app
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: host=db user=postgres password=password dbname=rebac_rbac_db port=5432 sslmode=disable
+      PORT: 4000
+      GIN_MODE: release
+      JWT_SECRET: docker-secret-key-change-in-production
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - rebac-network
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+
+networks:
+  rebac-network:
+    driver: bridge
+

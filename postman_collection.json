@@ -1,0 +1,512 @@
+{
+    "info": {
+        "_postman_id": "rbac-rebac-api-collection - go + postgres",
+        "name": "RBAC & ReBAC API",
+        "description": "Complete API collection for RBAC and ReBAC demonstration [go + postgres]",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Health Check",
+            "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/health",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "health"
+                    ]
+                },
+                "description": "Check if the API is running"
+            },
+            "response": []
+        },
+        {
+            "name": "Seed Database",
+            "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                    "raw": "{{base_url}}/seed",
+                    "host": [
+                        "{{base_url}}"
+                    ],
+                    "path": [
+                        "seed"
+                    ]
+                },
+                "description": "Seed the database with sample data (permissions, roles, users, records, relationships)"
+            },
+            "response": []
+        },
+        {
+            "name": "Authentication",
+            "item": [
+                {
+                    "name": "Register User",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    ""
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"newuser@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"New User\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/register",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "register"
+                            ]
+                        },
+                        "description": "Register a new user"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login - Doctor",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"doctor_token\", jsonData.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"doc@example.com\",\n  \"password\": \"password\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login as doctor (has record:read and record:write permissions)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login - Nurse",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"nurse_token\", jsonData.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"nurse@example.com\",\n  \"password\": \"password\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login as nurse (has record:read permission only)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login - Patient",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"patient_token\", jsonData.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"patient@example.com\",\n  \"password\": \"password\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login as patient (no role, but owns records)"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Login - Outsider",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "if (pm.response.code === 200) {",
+                                    "    var jsonData = pm.response.json();",
+                                    "    pm.environment.set(\"outsider_token\", jsonData.token);",
+                                    "}"
+                                ],
+                                "type": "text/javascript"
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"email\": \"outsider@example.com\",\n  \"password\": \"password\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{base_url}}/auth/login",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "auth",
+                                "login"
+                            ]
+                        },
+                        "description": "Login as outsider (no role, no relationships)"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "Authentication endpoints"
+        },
+        {
+            "name": "Records - RBAC",
+            "item": [
+                {
+                    "name": "Get Record (RBAC) - Doctor",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{doctor_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rbac/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rbac",
+                                "1"
+                            ]
+                        },
+                        "description": "Get record using RBAC - Doctor has record:read permission, should succeed"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Record (RBAC) - Nurse",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{nurse_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rbac/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rbac",
+                                "1"
+                            ]
+                        },
+                        "description": "Get record using RBAC - Nurse has record:read permission, should succeed"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Record (RBAC) - Patient",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{patient_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rbac/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rbac",
+                                "1"
+                            ]
+                        },
+                        "description": "Get record using RBAC - Patient has no role/permissions, should fail with 403"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Record (RBAC) - Outsider",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{outsider_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rbac/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rbac",
+                                "1"
+                            ]
+                        },
+                        "description": "Get record using RBAC - Outsider has no role/permissions, should fail with 403"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "RBAC-based access control endpoints"
+        },
+        {
+            "name": "Records - ReBAC",
+            "item": [
+                {
+                    "name": "Get Record (ReBAC) - Doctor",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{doctor_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rebac/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rebac",
+                                "1"
+                            ]
+                        },
+                        "description": "Get record using ReBAC - Doctor has relationship with patient and record, should succeed"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Record (ReBAC) - Patient",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{patient_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rebac/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rebac",
+                                "1"
+                            ]
+                        },
+                        "description": "Get record using ReBAC - Patient owns the record, should succeed"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Record (ReBAC) - Nurse",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{nurse_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rebac/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rebac",
+                                "1"
+                            ]
+                        },
+                        "description": "Get record using ReBAC - Nurse has no relationship, should fail with 403"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Record (ReBAC) - Outsider",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{outsider_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rebac/1",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rebac",
+                                "1"
+                            ]
+                        },
+                        "description": "Get record using ReBAC - Outsider has no relationship, should fail with 403"
+                    },
+                    "response": []
+                },
+                {
+                    "name": "Get Record (ReBAC) - Record 2",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{doctor_token}}",
+                                "type": "text"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{base_url}}/records/rebac/2",
+                            "host": [
+                                "{{base_url}}"
+                            ],
+                            "path": [
+                                "records",
+                                "rebac",
+                                "2"
+                            ]
+                        },
+                        "description": "Get record 2 using ReBAC - Doctor has indirect relationship (assigned_to patient), should succeed"
+                    },
+                    "response": []
+                }
+            ],
+            "description": "ReBAC-based access control endpoints"
+        }
+    ],
+    "variable": [
+        {
+            "key": "base_url",
+            "value": "http://localhost:4000",
+            "type": "string"
+        }
+    ]
+}
